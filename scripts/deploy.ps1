@@ -24,7 +24,17 @@ if (-not (az group show --name $ResourceGroup 2>$null)) {
 
 $template = if ($UseBicep) { Join-Path $root 'bicep/main.bicep' } else { Join-Path $root 'azuredeploy.json' }
 
-$azArgs = @('deployment','group','create','--resource-group',$ResourceGroup,'--template-file',$template)
+$azArgs = @(
+    'deployment',
+    'group',
+    'create',
+    '--resource-group',
+    $ResourceGroup,
+    '--template-file',
+    $template,
+    '--validation-level',
+    'Template'
+)
 if ($NamePrefix) { $azArgs += @('--parameters',"namePrefix=$NamePrefix") }
 
 az @azArgs

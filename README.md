@@ -224,6 +224,17 @@ A pure CLI flow is also provided:
 ./scripts/deploy.ps1 -ResourceGroup rg-cc-demo -UseBicep           # Bicep
 ```
 
+The script uses ARM template-level validation as a temporary workaround for a
+private-preview preflight issue. If you deploy the template directly with Azure
+CLI, include the same validation setting:
+
+```powershell
+az deployment group create `
+  --resource-group rg-cc-demo `
+  --template-file azuredeploy.json `
+  --validation-level Template
+```
+
 ---
 
 ## Repository layout
@@ -257,6 +268,7 @@ A pure CLI flow is also provided:
 | `FeatureNotRegistered` on deploy | Run the three `az feature register` commands above and wait until each reports `Registered`. Email azurecontextcacherp@microsoft.com if state stays `Pending`. |
 | `LocationNotAvailableForResourceType` | Only `centralus` (launch) and `swedencentral` are supported today. |
 | `InvalidResourceName` | `namePrefix` must be 3–12 lowercase letters/digits. |
+| `The context cache container could not be found or accessed` during preflight validation | Deploy with `az deployment group create ... --validation-level Template`, or use `scripts/deploy.ps1`, which applies this temporary private-preview workaround automatically. |
 | Cache appears not to be used (no latency / cost improvement) | Confirm your prefix is **byte-identical** across requests, longer than a few hundred tokens, and that traffic is hitting the deployment created by this template (not a sibling deployment without `contextCacheContainerId`). |
 | Need to unlink the cache later | PUT the same deployment with `properties.contextCacheContainerId` omitted (keep `sku` and `model` identical). |
 
